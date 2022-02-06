@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"workflou.com/auth/pkg/database"
+	"workflou.com/auth/pkg/loginlink"
 )
 
 type Application struct {
@@ -38,6 +39,7 @@ func New(cfg Config) *Application {
 
 func (app *Application) Handler() http.Handler {
 	r := mux.NewRouter()
+	r.Handle("/loginlink", loginlink.Create{Validate: *app.Validate}).Methods(http.MethodPost)
 
 	ar := r.NewRoute().Subrouter()
 	ar.Use(app.Authenticated)

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"workflou.com/auth/internal/application"
+	"workflou.com/auth/pkg/application"
 )
 
 func main() {

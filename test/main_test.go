@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	"gorm.io/gorm"
-	"workflou.com/auth/internal/application"
+	"workflou.com/auth/pkg/application"
+	"workflou.com/auth/pkg/user"
 )
 
 var (
@@ -35,6 +36,12 @@ func TestMain(m *testing.M) {
 
 	client = srv.Client()
 	os.Exit(m.Run())
+}
+
+func Teardown() {
+	app.DB.Connection.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(
+		&user.User{},
+	)
 }
 
 func Create(model interface{}) *gorm.DB {
