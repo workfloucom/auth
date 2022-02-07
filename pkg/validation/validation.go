@@ -1,4 +1,4 @@
-package application
+package validation
 
 import (
 	"reflect"
@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func NewValidator() *validator.Validate {
+func New() *validator.Validate {
 	validate := validator.New()
 
 	validate.RegisterTagNameFunc(func(f reflect.StructField) string {

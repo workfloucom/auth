@@ -1,6 +1,8 @@
 package test
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -52,12 +54,40 @@ func Get(url string) (*http.Response, error) {
 	return client.Get(srv.URL + url)
 }
 
-func Post(url string, body io.Reader) (*http.Response, error) {
-	return client.Post(srv.URL+url, "application/json", body)
+func Post(url string, body interface{}) (*http.Response, error) {
+	rb, err := json.Marshal(body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Post(srv.URL+url, "application/json", bytes.NewReader(rb))
 }
 
-func Patch(url string, body io.Reader) (*http.Response, error) {
-	r, err := http.NewRequest(http.MethodPatch, srv.URL+url, body)
+func Patch(url string, body interface{}) (*http.Response, error) {
+	rb, err := json.Marshal(body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := http.NewRequest(http.MethodPatch, srv.URL+url, bytes.NewReader(rb))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Do(r)
+}
+
+func Put(url string, body interface{}) (*http.Response, error) {
+	rb, err := json.Marshal(body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := http.NewRequest(http.MethodPut, srv.URL+url, bytes.NewReader(rb))
 
 	if err != nil {
 		return nil, err

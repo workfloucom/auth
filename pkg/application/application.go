@@ -6,8 +6,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"workflou.com/auth/internal/orm"
 	"workflou.com/auth/pkg/database"
-	"workflou.com/auth/pkg/loginlink"
+	"workflou.com/auth/pkg/link"
+	"workflou.com/auth/pkg/validation"
 )
 
 type Application struct {
@@ -25,6 +27,7 @@ func New(cfg Config) *Application {
 		RefreshSecret: cfg.RefreshSecret,
 		InfoLog:       log.New(cfg.InfoLogOutput, "INFO\t", log.LstdFlags),
 		ErrorLog:      log.New(cfg.ErrorLogOutput, "ERROR\t", log.LstdFlags),
+		Validate:      validation.New(),
 		DB: database.New(database.Config{
 			Env:             cfg.Env,
 			Driver:          cfg.Driver,
@@ -33,13 +36,17 @@ func New(cfg Config) *Application {
 			MaxIdleConns:    cfg.MaxIdleConns,
 			ConnMaxIdleTime: cfg.ConnMaxIdleTime,
 		}),
-		Validate: NewValidator(),
 	}
 }
 
 func (app *Application) Handler() http.Handler {
+	users := &orm.Users{DB: app.DB.Connection}
+
 	r := mux.NewRouter()
-	r.Handle("/loginlink", loginlink.Create{Validate: *app.Validate}).Methods(http.MethodPost)
+	r.Handle("/link", link.Create{
+		Validate: *app.Validate,
+		Users:    users,
+	}).Methods(http.MethodPost)
 
 	ar := r.NewRoute().Subrouter()
 	ar.Use(app.Authenticated)

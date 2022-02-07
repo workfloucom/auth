@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	go test ./...
+	go test ./test
 
 .PHONY: dev
 dev:
